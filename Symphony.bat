@@ -1,0 +1,1 @@
+start "" "C:\Program Files\MATLAB\R2016a\bin\matlab.exe" -nosplash -nodesktop -r run('C:\Users\Public\Documents\startup\startSymphony.m');
