@@ -12,3 +12,5 @@ This is a collection of files that make it convenient to start Symphony and Stag
 - **startSymphony.m** - MATLAB script that updates all git repos on the Symphony search path and starts the Symphony app
 
 Note that that \*.lnk shortcuts only exist because batch scripts cannot be added to the Window's taskbar. A workaround is to have a shortcut that points to the batch script and add the shortcut to the taskbar. Thus we have shortcuts so we can add Symphony and Stage Server to the Window's taskbar.
+
+These files assume the "startup" directory is located at "C:\\Users\\Public\\Documents\\startup".
