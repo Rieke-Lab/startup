@@ -46,8 +46,9 @@ function startSymphony()
         addpath(genpath(path));
     end
     
-    % Setup lab filename convention
+    % Setup lab file convention
     options.fileDefaultName = @()[datestr(now,'yyyy-mm-dd') '_' getenv('RIG_LETTER')];
+    options.fileCleanupFunction = @(ds)addConversionFactors(ds);
     options.save();
 
     % Start Symphony app
@@ -76,4 +77,37 @@ function status = update(path)
         warning(['Failed to get status: ' out]);
     end
     status = out;
+end
+
+function addConversionFactors(documentationService)
+    % Do not bother if all devices are not calibrated
+    experiment = documentationService.getExperiment();
+    devices = experiment.getDevices();
+    for i = 1:numel(devices)
+        device = devices{i};
+        
+        if isempty(regexpi(device.name, 'LED', 'once')) && isempty(regexpi(device.name, 'Stage', 'once'))
+            continue;
+        end
+        
+        resourceNames = device.getResourceNames();
+        if ~any(strcmp('spectrum', resourceNames)) ...
+                || ~any(strcmp('ndfAttenuations', resourceNames)) ...
+                || ~any(strcmp('fluxFactors', device.getResourceNames()))
+            return;
+        end
+    end
+    
+    busy = appbox.BusyPresenter('Cleaning Up...', 'Adding isomerization conversion factors.', ...
+        'width', appbox.hpix(290/11));
+    busy.go();
+    deleteBusy = onCleanup(@()delete(busy));
+    try
+        edu.washington.riekelab.util.addConversionFactors(documentationService.getExperiment());
+    catch x
+        appbox.MessagePresenter(['Failed to add one or more isomerization conversion factors. See the command ' ...
+            'window for more details. You can re-open the file and correct these issues to try again.'], ...
+            'Warning').goWaitStop();
+        warning(x.getReport());
+    end
 end
